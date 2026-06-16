@@ -288,6 +288,7 @@ void printTreePreview(const Option& option) {
         }
     }
 
+    //terminal output
     std::cout << "Small 3-Step Binomial Tree Preview\n\n";
     std::cout << "Example option: " << option.name << "\n";
     std::cout << "Spot S0:        " << option.spot << "\n";
@@ -344,12 +345,14 @@ bool writeTreeSvg(const Option& option, const std::string& fileName) {
         }
     }
 
+    //here we dont write it in the terminal but in a svg file
     std::ofstream svg(fileName);
 
     if (!svg.is_open()) {
         return false;
     }
 
+    //setup picture size and layout
     const int width = 900;
     const int height = 520;
     const int startX = 100;
@@ -357,7 +360,7 @@ bool writeTreeSvg(const Option& option, const std::string& fileName) {
     const int centerY = 270;
     const int stepY = 92;
 
-    svg << std::fixed << std::setprecision(2);
+    svg << std::fixed << std::setprecision(2); // eg 291.00
     svg << "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"" << width
         << "\" height=\"" << height << "\" viewBox=\"0 0 " << width << " " << height << "\">\n";
     svg << "<rect width=\"100%\" height=\"100%\" fill=\"#f8fafc\"/>\n";
@@ -366,6 +369,8 @@ bool writeTreeSvg(const Option& option, const std::string& fileName) {
     svg << "<text x=\"40\" y=\"78\" font-family=\"Arial\" font-size=\"15\" fill=\"#475569\">"
         << "Each node shows stock price S and American option value V.</text>\n";
 
+
+    // draw tree lines
     for (int step = 0; step < steps; ++step) {
         for (int i = 0; i <= step; ++i) {
             const int x1 = startX + step * stepX;
@@ -381,6 +386,7 @@ bool writeTreeSvg(const Option& option, const std::string& fileName) {
         }
     }
 
+    // draw nodes and values
     for (int step = 0; step <= steps; ++step) {
         for (int i = 0; i <= step; ++i) {
             const int x = startX + step * stepX;
@@ -397,6 +403,8 @@ bool writeTreeSvg(const Option& option, const std::string& fileName) {
         }
     }
 
+
+    // draw step labels
     for (int step = 0; step <= steps; ++step) {
         const int x = startX + step * stepX;
         svg << "<text x=\"" << x << "\" y=\"485\" text-anchor=\"middle\" font-family=\"Arial\""
@@ -408,6 +416,7 @@ bool writeTreeSvg(const Option& option, const std::string& fileName) {
 }
 
 void printPriceTable(const std::vector<Option>& options, const std::vector<int>& stepTests) {
+    // print the table
     std::cout << "American vs European Option Prices\n\n";
     std::cout << std::left
               << std::setw(22) << "Option"
@@ -466,15 +475,6 @@ void printVolatilityAnalysis() {
     }
 }
 
-void printSummary() {
-    std::cout << "\nSummary\n";
-    std::cout << "-------\n";
-    std::cout << "Option data is loaded from data/options.csv.\n";
-    std::cout << "More binomial steps make the price more stable.\n";
-    std::cout << "American puts can be worth more than European puts because early exercise is allowed.\n";
-    std::cout << "Higher volatility increases the option value because the possible price range becomes larger.\n";
-    std::cout << "Market prices can be updated with fetch_data.sh.\n";
-}
 
 int main() {
     std::vector<Option> options = loadOptionsFromCsv("data/options.csv");
@@ -509,7 +509,6 @@ int main() {
     }
 
     printVolatilityAnalysis();
-    printSummary();
 
     return 0;
 }

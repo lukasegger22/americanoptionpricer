@@ -655,24 +655,6 @@ higher volatility usually increases option value
 The function is useful because it shows parameter analysis without making the
 project complicated.
 
-## printSummary
-
-```cpp
-void printSummary()
-```
-
-This function prints a short interpretation of the output.
-
-It explains:
-
-- data is loaded from CSV
-- more steps make prices more stable
-- American puts can be more valuable than European puts
-- higher volatility increases option value
-- market prices can be updated with `fetch_data.sh`
-
-This makes the terminal output easier to understand during the presentation.
-
 ## main
 
 ```cpp
@@ -718,7 +700,6 @@ After that it prints:
 2. the small terminal tree preview
 3. the SVG tree
 4. the volatility analysis
-5. the summary
 
 This gives a complete flow:
 

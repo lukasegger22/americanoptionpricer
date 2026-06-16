@@ -174,7 +174,6 @@ The program prints:
 - results for several step counts
 - a 3-step tree preview in the terminal
 - a volatility analysis
-- a short summary
 
 The 25, 50, 100, and 200 step calculations are used for the actual pricing
 comparison. The 3-step tree is only a small visualization, because a 100-step or

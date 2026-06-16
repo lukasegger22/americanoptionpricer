@@ -9,41 +9,42 @@
 #include <string>
 #include <vector>
 
+// define new data type CALL or PUT for option type
 enum OptionType {
     CALL,
     PUT
 };
 
 enum ExerciseStyle {
-    EUROPEAN,
-    AMERICAN
+    EUROPEAN, // exercised at end
+    AMERICAN // exercised at any time
 };
 
 struct Option {
-    std::string name;
-    double spot;        // S_0: current stock/spot price
-    double strike;      // K: strike price
-    double rate;        // r: risk-free interest rate
-    double volatility;  // sigma
-    double maturity;    // T in years
+    std::string name; // eg Apple
+    double spot;  // S_0: current price
+    double strike; // K: strike price
+    double rate;  // r: risk-free interest rate eg 0.045 = 4.5% per year   
+    double volatility; // sigma - how volatile the stock is, eg 0.2 = 20% per year
+    double maturity; // T in years - when the option expires, eg 0.5 = 6 months
     OptionType type;
 };
 
-double payoff(double stockPrice, double strike, OptionType type) {
+double payoff(double stockPrice, double strike, OptionType type) { // value right now
     if (type == CALL) {
         return std::max(stockPrice - strike, 0.0);
     }
     return std::max(strike - stockPrice, 0.0);
 }
 
-std::string optionTypeName(OptionType type) {
+std::string optionTypeName(OptionType type) { // just for output to transform enum to strin
     if (type == CALL) {
         return "Call";
     }
     return "Put";
 }
 
-OptionType parseOptionType(const std::string& text) {
+OptionType parseOptionType(const std::string& text) { //convert to uppercase and compare to "CALL"/"PUT"
     std::string upperText;
     for (char c : text) {
         upperText += static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
@@ -55,7 +56,7 @@ OptionType parseOptionType(const std::string& text) {
     return PUT;
 }
 
-bool isValidOption(const Option& option) {
+bool isValidOption(const Option& option) { //true of false for input
     return option.spot > 0.0 &&
            option.strike > 0.0 &&
            option.rate >= 0.0 &&
@@ -63,12 +64,13 @@ bool isValidOption(const Option& option) {
            option.maturity > 0.0;
 }
 
+// Split a CSV line into individual values eg Apple Put Example,195.00,200.00,0.045,0.25,1.0,PUT
 std::vector<std::string> splitCsvLine(const std::string& line) {
     std::vector<std::string> values;
-    std::stringstream stream(line);
+    std::stringstream stream(line); //readable input stream from the line
     std::string value;
 
-    while (std::getline(stream, value, ',')) {
+    while (std::getline(stream, value, ',')) { // read until comma
         values.push_back(value);
     }
 

@@ -71,8 +71,8 @@ CSV format:
 
 ```csv
 name,spot,strike,rate,volatility,maturity,type
-Apple Put Example,195.00,200.00,0.045,0.25,1.0,PUT
-Apple Call Example,195.00,200.00,0.045,0.25,1.0,CALL
+AAPL Put Example,291.00,300.00,0.045,0.25,1.0,PUT
+AAPL Call Example,291.00,300.00,0.045,0.25,1.0,CALL
 High Volatility Put,100.00,100.00,0.045,0.40,1.0,PUT
 ```
 
@@ -80,8 +80,8 @@ The C++ program reads these rows into a `std::vector<Option>`.
 
 ## Market Data
 
-The program can optionally update the AAPL spot price with Alpha Vantage daily
-stock data.
+The program can optionally update the selected stock spot price with Alpha
+Vantage daily stock data. The current symbol in the C++ code is `AAPL`.
 
 Current workflow:
 
@@ -90,16 +90,31 @@ Current workflow:
 ```
 
 If `.alphavantage_key` exists, the program automatically tries to fetch the
-latest AAPL close price. If the API call fails, it still runs with the fallback
-values from `data/options.csv`.
+latest close price for the selected symbol. If the API call fails, it still runs
+with the fallback values from `data/options.csv`.
 
 Safe presentation behavior:
 
 ```text
-API works  -> use fresh AAPL close price as spot
+API works  -> use fresh market close price as spot
 API fails  -> use values from data/options.csv
 No API key -> use values from data/options.csv
 ```
+
+Common symbols that are easy to test with Alpha Vantage:
+
+```text
+AAPL  Apple
+MSFT  Microsoft
+GOOGL Alphabet / Google
+AMZN  Amazon
+TSLA  Tesla
+NVDA  Nvidia
+```
+
+To test another symbol, change `marketSymbol` in `src/main.cpp` and make sure
+the option names in `data/options.csv` contain the same symbol, for example
+`MSFT Call Example`.
 
 For current market data, use a personal free Alpha Vantage API key. Without an
 API key, the program automatically uses the fallback values from `data/options.csv`.

@@ -243,13 +243,13 @@ This function splits one CSV line at commas.
 Example:
 
 ```text
-Apple Put Example,195.00,200.00,0.045,0.25,1.0,PUT
+AAPL Put Example,291.00,300.00,0.045,0.25,1.0,PUT
 ```
 
 becomes a vector of strings:
 
 ```text
-["Apple Put Example", "195.00", "200.00", "0.045", "0.25", "1.0", "PUT"]
+["AAPL Put Example", "291.00", "300.00", "0.045", "0.25", "1.0", "PUT"]
 ```
 
 It uses:
@@ -325,7 +325,7 @@ It returns `false` if the file is missing, malformed, or contains invalid data.
 ## updateMarketSpotFromApi
 
 ```cpp
-bool updateMarketSpotFromApi(std::vector<Option>& options)
+bool updateMarketSpotFromApi(std::vector<Option>& options, const std::string& symbol)
 ```
 
 This function implements the optional API update.
@@ -349,18 +349,19 @@ using:
 std::system(...)
 ```
 
-The shell script downloads daily Apple stock data from Alpha Vantage and writes
-the latest close price to a CSV file.
+The shell script downloads daily stock data for the selected symbol from Alpha
+Vantage and writes the latest close price to a CSV file.
 
 Then `readLatestClosePrice` reads the latest close price.
 
-Finally, every option whose name contains `"Apple"` or `"AAPL"` receives the updated spot:
+Finally, every option whose name contains the selected symbol, for example
+`"AAPL"`, receives the updated spot:
 
 ```cpp
 option.spot = latestSpot;
 ```
 
-The function returns `true` if at least one Apple option was updated.
+The function returns `true` if at least one matching option was updated.
 
 This design is presentation-safe:
 
@@ -707,7 +708,8 @@ const std::vector<int> stepTests = {25, 50, 100, 200};
 Then it tries the optional API update:
 
 ```cpp
-const bool marketDataUpdated = updateMarketSpotFromApi(options);
+const std::string marketSymbol = "AAPL";
+const bool marketDataUpdated = updateMarketSpotFromApi(options, marketSymbol);
 ```
 
 After that it prints:

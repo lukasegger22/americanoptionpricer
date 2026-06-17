@@ -17,7 +17,7 @@
 
   \begin{itemize}
     \item Input: option parameters from \texttt{data/options.csv}
-    \item Optional API update: latest AAPL spot price from Alpha Vantage
+    \item Optional API update: latest selected stock price from Alpha Vantage
     \item API key can be stored locally in \texttt{.alphavantage\_key}
     \item If the API fails, the program falls back to CSV values
     \item Output: American price, European price, early exercise premium
@@ -25,32 +25,44 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Model And Formula}
+\begin{frame}{Model And Formulas}
   Cox-Ross-Rubinstein binomial model:
 
   \[
+    \Delta t = \frac{T}{N},
+    \quad
     u = e^{\sigma\sqrt{\Delta t}},
     \quad
-    d = \frac{1}{u},
-    \quad
-    p = \frac{e^{r\Delta t} - d}{u-d}
+    d = \frac{1}{u}
   \]
 
-  Continuation value:
+  Stock price at node:
+  \[
+    S_{n,i} = S_0 u^i d^{n-i}
+  \]
+
+  Payoff at maturity:
+  \[
+    C = \max(S-K,0),
+    \quad
+    P = \max(K-S,0)
+  \]
+
+  Backward induction:
 
   \[
+    p = \frac{e^{r\Delta t} - d}{u-d},
+    \quad
     V_{\text{cont}} = e^{-r\Delta t}
     \left(pV_{\text{up}} + (1-p)V_{\text{down}}\right)
   \]
 
-  American exercise decision:
-
   \[
-    V = \max(V_{\text{cont}}, V_{\text{exercise}})
+    V_{\text{American}} = \max(V_{\text{cont}}, V_{\text{exercise}})
   \]
 \end{frame}
 
-\begin{frame}{C++ Features Used}
+\begin{frame}{C++ Features And Libraries}
   \begin{itemize}
     \item \texttt{struct Option}: stores spot, strike, rate, volatility, maturity
     \item \texttt{enum}: call/put and European/American
@@ -58,30 +70,10 @@
     \item \texttt{std::vector<double>}: stores one binomial tree level
     \item \texttt{std::ifstream}, \texttt{std::ofstream}: CSV input and SVG output
     \item \texttt{std::stringstream}: simple CSV parsing
-    \item \texttt{std::max}: payoff and early exercise decision
+    \item \texttt{<cmath>}: \texttt{exp}, \texttt{sqrt}, \texttt{pow} for model formulas
+    \item \texttt{std::max}: payoff and American early exercise decision
+    \item \texttt{std::system}: calls the simple Alpha Vantage fetch script
     \item Not used: threads, \texttt{optional}, \texttt{variant}; not needed for this small deterministic model
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Output And Pipeline}
-  \textbf{Pipeline:}
-
-  \begin{enumerate}
-    \item CSV fallback or AAPL API data
-    \item Store option parameters in \texttt{std::vector<Option>}
-    \item Run binomial pricing with backward induction
-    \item Print tables and generate \texttt{binomial\_tree.svg}
-  \end{enumerate}
-
-  \vspace{0.3cm}
-
-  The program prints:
-  \begin{itemize}
-    \item American vs European option prices
-    \item Early exercise premium
-    \item Price stability for different step counts
-    \item Volatility analysis
-    \item A 3-step tree preview and \texttt{binomial\_tree.svg}
   \end{itemize}
 \end{frame}
 

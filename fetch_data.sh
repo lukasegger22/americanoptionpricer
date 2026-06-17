@@ -8,6 +8,7 @@ DAILY_FILE="$OUTPUT_DIR/${SYMBOL}_daily.csv"
 LATEST_FILE="$OUTPUT_DIR/${SYMBOL}_latest_price.csv"
 TEMP_FILE="$OUTPUT_DIR/${SYMBOL}_daily.tmp.csv"
 
+#read key from .alphavantage_key file if it exists
 if [ -z "$ALPHAVANTAGE_API_KEY" ] && [ -f "$KEY_FILE" ]; then
     ALPHAVANTAGE_API_KEY=$(sed -n '1p' "$KEY_FILE" | tr -d '[:space:]')
 fi

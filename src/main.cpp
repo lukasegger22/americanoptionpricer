@@ -78,7 +78,7 @@ std::vector<std::string> splitCsvLine(const std::string& line) {
 }
 
 std::vector<Option> loadOptionsFromCsv(const std::string& fileName) {
-    std::ifstream file(fileName); // open "data/options.csv"
+    std::ifstream file(fileName); // read in "data/options.csv"
     std::vector<Option> options;
 
     if (!file.is_open()) {
@@ -147,7 +147,7 @@ bool readLatestClosePrice(const std::string& fileName, double& closePrice) {
 }
 
 bool updateMarketSpotFromApi(std::vector<Option>& options, const std::string& symbol) { //if we change options we change it outside as well 
-    //try both paths
+    //try both paths and can execute the script in terminal
     int result = std::system(("./fetch_data.sh " + symbol + " > /dev/null 2>&1").c_str()); //start fetch data script
     if (result != 0) {
         result = std::system(("../fetch_data.sh " + symbol + " > /dev/null 2>&1").c_str());
@@ -201,7 +201,7 @@ double priceOption(const Option& option, int steps, ExerciseStyle style) {
 
 
     double stockPrice = option.spot * std::pow(down, steps); // S0 * d^N
-    //go through all end nodes and calculate the payoff for each node
+    //go through all END nodes and calculate the payoff for each node
     for (int i = 0; i <= steps; ++i) {
         optionValues[i] = payoff(stockPrice, option.strike, option.type);
         stockPrice *= stepMultiplier; // lowest S0*d^N -> (step) S0 * d^(N-1) * u
@@ -345,8 +345,8 @@ bool writeTreeSvg(const Option& option, const std::string& fileName) {
         }
     }
 
-    //here we dont write it in the terminal but in a svg file
-    std::ofstream svg(fileName);
+
+    std::ofstream svg(fileName); //write in svg file
 
     if (!svg.is_open()) {
         return false;
@@ -428,6 +428,7 @@ void printPriceTable(const std::vector<Option>& options, const std::vector<int>&
               << "\n";
     std::cout << std::string(74, '-') << "\n";
 
+    //go through options.csv 
     for (const Option& option : options) {
         if (!isValidOption(option)) {
             std::cout << option.name << " has invalid input data and is skipped.\n\n";
@@ -435,10 +436,13 @@ void printPriceTable(const std::vector<Option>& options, const std::vector<int>&
         }
 
         for (int steps : stepTests) {
+            //calculate the whole option
             const double americanPrice = priceOption(option, steps, AMERICAN);
             const double europeanPrice = priceOption(option, steps, EUROPEAN);
+            //if premium is = 0 then it is not worth to exercise the option early
             const double earlyExercisePremium = americanPrice - europeanPrice;
 
+            // print the values in a table
             std::cout << std::left
                       << std::setw(22) << option.name
                       << std::setw(8) << optionTypeName(option.type)
@@ -465,7 +469,8 @@ void printVolatilityAnalysis() {
     std::cout << std::string(26, '-') << "\n";
 
     for (double volatility : volatilityTests) {
-        option.volatility = volatility;
+        option.volatility = volatility; //change the volatility for each test
+        //calculate the price for each volatility
         const double price = priceOption(option, steps, AMERICAN);
 
         std::cout << std::left
@@ -489,7 +494,8 @@ int main() {
     }
 
     const std::vector<int> stepTests = {25, 50, 100, 200};
-    const std::string marketSymbol = "GOOGL";
+    const std::string marketSymbol = "AAPL";
+    //want to get the latest price from Alpha Vantage
     const bool marketDataUpdated = updateMarketSpotFromApi(options, marketSymbol);
 
     std::cout << std::fixed << std::setprecision(4);

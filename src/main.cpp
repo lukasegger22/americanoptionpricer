@@ -44,7 +44,7 @@ std::string optionTypeName(OptionType type) { // just for output to transform en
     return "Put";
 }
 
-OptionType parseOptionType(const std::string& text) { //convert to uppercase and compare to "CALL"/"PUT"
+OptionType parseOptionType(const std::string& text) { //convert to uppercase and for enum we can only have CALL or PUT
     std::string upperText;
     for (char c : text) {
         upperText += static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
